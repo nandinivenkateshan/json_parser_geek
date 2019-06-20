@@ -1,11 +1,15 @@
 
 let fs = require('fs')
-let nullInput = fs.readFileSync('nullInput.json').toString()
-let booleanInput = fs.readFileSync('booleanInput.json').toString()
-let numberInput = fs.readFileSync('numberInput.json').toString()
-let strInput = fs.readFileSync('stringInput.json').toString()
-let arrInput = fs.readFileSync('arrInput.json').toString()
-let obj = fs.readFileSync('obj.json').toString()
+let allParserInput = fs.readFileSync('allParserFile.json').toString()
+
+let allParser = allParserInput => {
+  let parseAll = [nullParse, booleanParse, numberParse, stringParser, arrayParse, objectParser]
+  for (let key of parseAll) {
+    let resArr = key(allParserInput)
+    if (resArr !== null) return resArr
+  }
+  return null
+}
 
 const nullParse = nullInput => {
   return (nullInput.startsWith('null')) ? [null, nullInput.slice(4)] : null
@@ -53,7 +57,6 @@ const numberParse = numberInput => {
     return null
   }
 }
-// console.log(numberParse(numberInput))
 
 const stringParser = strInput => {
   let array = strInput.split('')
@@ -144,33 +147,24 @@ const stringParser = strInput => {
     return null
   }
 }
-// console.log(stringParser(strInput))
-
-let allParser = str => {
-  let parseAll = [nullParse, booleanParse, numberParse, stringParser, arrayParse, objectParser]
-  for (let key of parseAll) {
-    let resArr = key(str)
-    if (resArr !== null) return resArr
-  }
-  return null
-}
 
 const arrayParse = arrInput => {
   let validParsedArr = []
+  let resultArr
   arrInput = arrInput.trim()
   if (arrInput.startsWith('[')) {
     arrInput = arrInput.slice(1)
     arrInput = arrInput.trim()
-    let resultArr
     while (arrInput[0] !== ']') {
+      arrInput = arrInput.trim()
       resultArr = allParser(arrInput)
       if (resultArr === null) return null
       validParsedArr.push(resultArr[0])
       arrInput = resultArr[1].trim()
-      if ((arrInput[0] === ',') && arrInput[1] === ']') return null
       if (arrInput[0] === ',') {
         resultArr = arrInput.slice(1)
         arrInput = resultArr.trim()
+        if (arrInput.startsWith(']')) return null
       }
     }
     return [validParsedArr, arrInput.slice(1)]
@@ -178,7 +172,6 @@ const arrayParse = arrInput => {
     return null
   }
 }
-// console.log(arrayParse(arrInput))
 
 const objectParser = obj => {
   obj = obj.trim()
@@ -206,10 +199,10 @@ const objectParser = obj => {
       newObj[key] = value
       obj = objArr[1]
       obj = obj.trim()
-      if ((obj[0] === ',') && (obj[1] === '}')) return null
       if (obj[0] === ',') {
         objArr = obj.slice(1)
         obj = objArr.trim()
+        if (obj.startsWith('}')) return null
       }
     }
     return [newObj, obj.slice(1)]
@@ -217,4 +210,4 @@ const objectParser = obj => {
     return null
   }
 }
-console.log(objectParser(obj))
+console.log(allParser(allParserInput))
