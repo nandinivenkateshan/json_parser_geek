@@ -11,17 +11,11 @@ let allParser = allParserInput => {
   return null
 }
 
-const nullParse = nullInput => {
-  return (nullInput.startsWith('null')) ? [null, nullInput.slice(4)] : null
-}
+const nullParse = nullInput => (nullInput.startsWith('null')) ? [null, nullInput.slice(4)] : null
 
 const booleanParse = booleanInput => {
-  if (booleanInput.startsWith('true')) {
-    return [true, booleanInput.slice(4)]
-  }
-  if (booleanInput.startsWith('false')) {
-    return [false, booleanInput.slice(5)]
-  }
+  if (booleanInput.startsWith('true')) return [true, booleanInput.slice(4)]
+  if (booleanInput.startsWith('false')) return [false, booleanInput.slice(5)]
   return null
 }
 
@@ -41,9 +35,8 @@ const numberParse = numberInput => {
     let index = num[0].length
     return [num[0] * 1, numberInput.slice(index)]
   }
-  if (zeroNaN.test(numberInput)) {
-    return null
-  }
+  if (zeroNaN.test(numberInput)) return null
+
   if (zero.test(numberInput)) {
     let num = numberInput.match(zero)
     let index = num[0].length
@@ -53,23 +46,12 @@ const numberParse = numberInput => {
     let num = numberInput.match(decimalInfinity)
     let index = num[0].length
     return [num[0] * 1, numberInput.slice(index)]
-  } else {
-    return null
-  }
+  } else return null
 }
 
 const stringParser = strInput => {
   let validArr = []
-  const char = {
-    '"': '"',
-    'b': '\b',
-    'f': '\f',
-    'n': '\n',
-    'r': '\r',
-    't': '\t',
-    '/': '/',
-    '\\': '\\'
-  }
+  const char = { '"': '"', 'b': '\b', 'f': '\f', 'n': '\n', 'r': '\r', 't': '\t', '/': '/', '\\': '\\' }
   let hexVal = '0123456789ABCDEFabcdef'.split('')
   if (strInput.startsWith('"')) {
     strInput = strInput.slice(1)
@@ -84,17 +66,14 @@ const stringParser = strInput => {
           let unicode = strInput.slice(2)
           let count = 0
           let i = 0
-          if (unicode.length <= 4) {
-            return null
-          } else {
+          if (unicode.length <= 4) return null
+          else {
             let sliceHex = unicode.slice(0, 4)
             while (count < 4) {
               if (hexVal.includes(sliceHex[i])) {
                 count++
                 i++
-              } else {
-                return null
-              }
+              } else return null
             }
             if (count === 4) {
               let unicodeStr = unicode.slice(0, 4)
@@ -111,9 +90,7 @@ const stringParser = strInput => {
     }
     validArr = validArr.join('')
     return [validArr, strInput.slice(1)]
-  } else {
-    return null
-  }
+  } else return null
 }
 
 const arrayParse = arrInput => {
@@ -136,9 +113,7 @@ const arrayParse = arrInput => {
       }
     }
     return [validParsedArr, arrInput.slice(1)]
-  } else {
-    return null
-  }
+  } else return null
 }
 
 const objectParser = obj => {
@@ -158,9 +133,8 @@ const objectParser = obj => {
       if (obj[0] === ':') {
         objArr = obj.slice(1)
         obj = objArr.trim()
-      } else if (obj[0] !== ':') {
-        return null
-      }
+      } else if (obj[0] !== ':') return null
+
       objArr = allParser(obj)
       if (objArr === null) return null
       value = objArr[0]
@@ -174,8 +148,6 @@ const objectParser = obj => {
       }
     }
     return [newObj, obj.slice(1)]
-  } else {
-    return null
-  }
+  } else return null
 }
 console.log(allParser(allParserInput))
