@@ -59,10 +59,7 @@ const numberParse = numberInput => {
 }
 
 const stringParser = strInput => {
-  let array = strInput.split('')
-  let j = 0
   let validArr = []
-  let index = []
   const char = {
     '"': '"',
     'b': '\b',
@@ -74,41 +71,20 @@ const stringParser = strInput => {
     '\\': '\\'
   }
   let hexVal = '0123456789ABCDEFabcdef'.split('')
-  let invalidStr = []
   if (strInput.startsWith('"')) {
-    array.map((item, i) => {
-      if (item === '"') {
-        index.push(i)
-      }
-    })
-    let indexArr = []
-    for (let i = 1; i < array.length; i++) {
-      if ((array[i] === '\\') && (array[i + 1] === '"')) {
-        indexArr.push(i + 1)
-      }
-    }
-    let indexOfQoutes = []
-    if (index.length > 2) {
-      for (let i = 0; i < index.length; i++) {
-        if (!indexArr.includes(index[i])) {
-          indexOfQoutes.push(index[i])
-        }
-      }
-    } else {
-      indexOfQoutes = [...index]
-    }
-    let validStr = (array.slice(indexOfQoutes[0] + 1, indexOfQoutes[1]))
-    while (j < validStr.length) {
-      if ((validStr[j] === '\n') || (validStr[j] === '\t') || (validStr[j] === '\r') || (validStr[j] === '\b') || (validStr[j] === '\f')) return null
-      if (validStr[j] === char['\\']) {
-        if (char.hasOwnProperty(validStr[j + 1])) {
-          validArr.push(char[validStr[j + 1]])
-          j = j + 2
-        } else if (validStr[j + 1] === 'u') {
-          let unicode = validStr.slice(j + 2)
+    strInput = strInput.slice(1)
+    while (strInput[0] !== '"' && strInput.length !== 0) {
+      if ((strInput[0] === '\n') || (strInput[0] === '\t') || (strInput[0] === '\r') || (strInput[0] === '\b') || (strInput[0] === '\f')) return null
+      if (strInput[0] === '\\') {
+        if (char.hasOwnProperty(strInput[1])) {
+          validArr.push(char[strInput[1]])
+          strInput = strInput.slice(2)
+          if (strInput.indexOf('"') !== -1) continue
+        } else if (strInput[1] === 'u') {
+          let unicode = strInput.slice(2)
           let count = 0
           let i = 0
-          if (unicode.length < 4) {
+          if (unicode.length <= 4) {
             return null
           } else {
             let sliceHex = unicode.slice(0, 4)
@@ -121,28 +97,20 @@ const stringParser = strInput => {
               }
             }
             if (count === 4) {
-              let unicodeArr = unicode.slice(0, 4)
-              let unicodeStr = unicodeArr.join('')
+              let unicodeStr = unicode.slice(0, 4)
               let getUnicode = String.fromCodePoint(parseInt(unicodeStr, 16))
               validArr.push(getUnicode)
             }
-            j = j + 6
+            strInput = strInput.slice(6)
+            continue
           }
-        } else {
-          return null
-        }
-      } else if (validStr[j] === char['"']) {
-        invalidStr.push(char['"'])
-        j++
-      } else {
-        validArr.push(validStr[j])
-        j++
+        } else return null
       }
+      validArr.push(strInput[0])
+      strInput = strInput.slice(1)
     }
-    invalidStr.push((array.slice(indexOfQoutes[1] + 1)).join(''))
-    invalidStr = invalidStr.join('')
     validArr = validArr.join('')
-    return [validArr, invalidStr]
+    return [validArr, strInput.slice(1)]
   } else {
     return null
   }
