@@ -1,1 +1,1 @@
-complete json parsing
+Complete JSON parser written in Javascript
