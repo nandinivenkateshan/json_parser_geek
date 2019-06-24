@@ -150,4 +150,4 @@ const objectParser = obj => {
     return [newObj, obj.slice(1)]
   } else return null
 }
-console.log(allParser(allParserInput))
+// console.log(allParser(allParserInput))
