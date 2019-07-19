@@ -2,68 +2,68 @@
 let fs = require('fs')
 let allParserInput = fs.readFileSync('allParserFile.json').toString()
 
-let allParser = allParserInput => {
+let allParser = input => {
   let parseAll = [nullParse, booleanParse, numberParse, stringParser, arrayParse, objectParser]
   for (let key of parseAll) {
-    let resArr = key(allParserInput)
+    let resArr = key(input)
     if (resArr !== null) return resArr
   }
   return null
 }
 
-const nullParse = nullInput => (nullInput.startsWith('null')) ? [null, nullInput.slice(4)] : null
+const nullParse = input => (input.startsWith('null')) ? [null, input.slice(4)] : null
 
-const booleanParse = booleanInput => {
-  if (booleanInput.startsWith('true')) return [true, booleanInput.slice(4)]
-  if (booleanInput.startsWith('false')) return [false, booleanInput.slice(5)]
+const booleanParse = input => {
+  if (input.startsWith('true')) return [true, input.slice(4)]
+  if (input.startsWith('false')) return [false, input.slice(5)]
   return null
 }
 
-const numberParse = numberInput => {
+const numberParse = input => {
   let zeroInfinity = /^[-]?0(\.[0-9]+([eE][+-]?[0-9]+)?)/
   let zeroNaN = /^[-]?0[0-9]+/
   let zero = /^[-]?0/
   let zeroNum = /^[-]?0([eE][+-]?[0-9]+)/
   let decimalInfinity = /^[-]?[1-9][0-9]*(\.?[0-9]*([eE][+-]?[0-9]+)?)?/
-  if (zeroInfinity.test(numberInput)) {
-    let num = numberInput.match(zeroInfinity)
+  if (zeroInfinity.test(input)) {
+    let num = input.match(zeroInfinity)
     let index = num[0].length
-    return [num[0] * 1, numberInput.slice(index)]
+    return [num[0] * 1, input.slice(index)]
   }
-  if (zeroNum.test(numberInput)) {
-    let num = numberInput.match(zeroNum)
+  if (zeroNum.test(input)) {
+    let num = input.match(zeroNum)
     let index = num[0].length
-    return [num[0] * 1, numberInput.slice(index)]
+    return [num[0] * 1, input.slice(index)]
   }
-  if (zeroNaN.test(numberInput)) return null
+  if (zeroNaN.test(input)) return null
 
-  if (zero.test(numberInput)) {
-    let num = numberInput.match(zero)
+  if (zero.test(input)) {
+    let num = input.match(zero)
     let index = num[0].length
-    return [num[0] * 1, numberInput.slice(index)]
+    return [num[0] * 1, input.slice(index)]
   }
-  if (decimalInfinity.test(numberInput)) {
-    let num = numberInput.match(decimalInfinity)
+  if (decimalInfinity.test(input)) {
+    let num = input.match(decimalInfinity)
     let index = num[0].length
-    return [num[0] * 1, numberInput.slice(index)]
+    return [num[0] * 1, input.slice(index)]
   } else return null
 }
 
-const stringParser = strInput => {
+const stringParser = input => {
   let validArr = []
   const char = { '"': '"', 'b': '\b', 'f': '\f', 'n': '\n', 'r': '\r', 't': '\t', '/': '/', '\\': '\\' }
   let hexVal = '0123456789ABCDEFabcdef'.split('')
-  if (strInput.startsWith('"')) {
-    strInput = strInput.slice(1)
-    while (strInput[0] !== '"' && strInput.length !== 0) {
-      if ((strInput[0] === '\n') || (strInput[0] === '\t') || (strInput[0] === '\r') || (strInput[0] === '\b') || (strInput[0] === '\f')) return null
-      if (strInput[0] === '\\') {
-        if (char.hasOwnProperty(strInput[1])) {
-          validArr.push(char[strInput[1]])
-          strInput = strInput.slice(2)
-          if (strInput.indexOf('"') !== -1) continue
-        } else if (strInput[1] === 'u') {
-          let unicode = strInput.slice(2)
+  if (input.startsWith('"')) {
+    input = input.slice(1)
+    while (input[0] !== '"' && input.length !== 0) {
+      if ((input[0] === '\n') || (input[0] === '\t') || (input[0] === '\r') || (input[0] === '\b') || (input[0] === '\f')) return null
+      if (input[0] === '\\') {
+        if (char.hasOwnProperty(input[1])) {
+          validArr.push(char[input[1]])
+          input = input.slice(2)
+          if (input.indexOf('"') !== -1) continue
+        } else if (input[1] === 'u') {
+          let unicode = input.slice(2)
           let count = 0
           let i = 0
           if (unicode.length <= 4) return null
@@ -80,16 +80,16 @@ const stringParser = strInput => {
               let getUnicode = String.fromCodePoint(parseInt(unicodeStr, 16))
               validArr.push(getUnicode)
             }
-            strInput = strInput.slice(6)
+            input = input.slice(6)
             continue
           }
         } else return null
       }
-      validArr.push(strInput[0])
-      strInput = strInput.slice(1)
+      validArr.push(input[0])
+      input = input.slice(1)
     }
     validArr = validArr.join('')
-    return [validArr, strInput.slice(1)]
+    return [validArr, input.slice(1)]
   } else return null
 }
 
@@ -150,4 +150,4 @@ const objectParser = obj => {
     return [newObj, obj.slice(1)]
   } else return null
 }
-// console.log(allParser(allParserInput))
+console.log(allParser(allParserInput))
