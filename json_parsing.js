@@ -46,7 +46,8 @@ const numberParse = input => {
     let num = input.match(decimalInfinity)
     let index = num[0].length
     return [num[0] * 1, input.slice(index)]
-  } else return null
+  }
+  return null
 }
 
 const stringParser = input => {
@@ -62,35 +63,36 @@ const stringParser = input => {
           validArr.push(char[input[1]])
           input = input.slice(2)
           if (input.indexOf('"') !== -1) continue
-        } else if (input[1] === 'u') {
+        }
+        if (input[1] === 'u') {
           let unicode = input.slice(2)
           let count = 0
           let i = 0
           if (unicode.length <= 4) return null
-          else {
-            let sliceHex = unicode.slice(0, 4)
-            while (count < 4) {
-              if (hexVal.includes(sliceHex[i])) {
-                count++
-                i++
-              } else return null
-            }
-            if (count === 4) {
-              let unicodeStr = unicode.slice(0, 4)
-              let getUnicode = String.fromCodePoint(parseInt(unicodeStr, 16))
-              validArr.push(getUnicode)
-            }
-            input = input.slice(6)
-            continue
+          let sliceHex = unicode.slice(0, 4)
+          while (count < 4) {
+            if (hexVal.includes(sliceHex[i])) {
+              count++
+              i++
+            } else return null
           }
-        } else return null
+          if (count === 4) {
+            let unicodeStr = unicode.slice(0, 4)
+            let getUnicode = String.fromCodePoint(parseInt(unicodeStr, 16))
+            validArr.push(getUnicode)
+          }
+          input = input.slice(6)
+          continue
+        }
+        return null
       }
       validArr.push(input[0])
       input = input.slice(1)
     }
     validArr = validArr.join('')
     return [validArr, input.slice(1)]
-  } else return null
+  }
+  return null
 }
 
 const arrayParse = arrInput => {
@@ -113,7 +115,8 @@ const arrayParse = arrInput => {
       }
     }
     return [validParsedArr, arrInput.slice(1)]
-  } else return null
+  }
+  return null
 }
 
 const objectParser = obj => {
@@ -134,7 +137,6 @@ const objectParser = obj => {
         objArr = obj.slice(1)
         obj = objArr.trim()
       } else if (obj[0] !== ':') return null
-
       objArr = allParser(obj)
       if (objArr === null) return null
       value = objArr[0]
@@ -148,6 +150,7 @@ const objectParser = obj => {
       }
     }
     return [newObj, obj.slice(1)]
-  } else return null
+  }
+  return null
 }
 console.log(allParser(allParserInput))
