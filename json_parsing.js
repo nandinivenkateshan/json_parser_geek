@@ -57,7 +57,6 @@ const stringParser = input => {
   if (input.startsWith('"')) {
     input = input.slice(1)
     while (input[0] !== '"' && input.length !== 0) {
-      if ((input[0] === '\n') || (input[0] === '\t') || (input[0] === '\r') || (input[0] === '\b') || (input[0] === '\f')) return null
       if (input[0] === '\\') {
         if (char.hasOwnProperty(input[1])) {
           validArr.push(char[input[1]])
